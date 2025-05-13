@@ -3,36 +3,48 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-
-void minPush(uint8_t arr[], uint8_t j, uint8_t newElem) {
-
-    while (j > 0 && arr[j - 1] > newElem) {
+void minPush(int arr[], uint16_t current_elements, int newElem)
+{
+    uint16_t j = current_elements;
+    while (j > 0 && arr[j - 1] > newElem)
+    {
         arr[j] = arr[j - 1];
         j--;
     }
-
     arr[j] = newElem;
 }
 
-void game(){
+void game()
+{
+    uint8_t n;
+    scanf("%hhu", &n);
+    uint16_t size = 2 * n;
+    int arr[size];
 
-uint8_t n;
-scanf("%hhu", &n);
-uint16_t size = 2 * n;
-uint8_t arr[size];
+    for (uint16_t i = 0; i < size; i++)
+    {
+        int e;
+        scanf("%d", &e);
+        minPush(arr, i, e);
+    }
 
-for(uint16_t i = 0; i < size)
-    uint8_t e;
-    scanf("%hhu", e);
-    minPush(arr, i, e)
+    long long result = 0;
+
+    for (uint8_t i = 0; i < n; i++)
+    {
+        result += arr[i * 2];
+    }
+
+    printf("%lld\n", result);
 }
 
-int main(){
-    uint8_t n;
+int main()
+{
+    int t;
+    scanf("%d", &t);
 
-    scanf("%hhu", &n);  
-
-    for(uint8_t i = 0; i < n; i++){
+    for (int i = 0; i < t; i++)
+    {
         game();
     }
     return 0;
