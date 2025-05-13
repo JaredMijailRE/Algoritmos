@@ -9,12 +9,21 @@ int main(){
     uint8_t k;
     scanf("%hhu %hhu", &n, &k);
     uint8_t maxMinutes = 4 * 60;
-    maxMinutes =- k;
-    uint8_t i = maxMinutes / 5;
-    if(i > n){
-        i = n;
+    maxMinutes -= k;
+    uint8_t numExcercise = 0;
+
+
+    uint8_t total = 0;
+    for(uint8_t i = 1; i <= n; i++){
+        total += 5 * i;
+        if(total <= maxMinutes){
+            numExcercise++;
+        } else {
+            break;
+        }
     }
-    printf("%hhu", i);
+
+    printf("%hhu\n", numExcercise);
 
     return 0;
 }
