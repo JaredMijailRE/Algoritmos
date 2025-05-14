@@ -3,74 +3,82 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-struct D
-{
-    int app;
-    bool read;
-};
-
-struct notiList
-{
-    int last;
-    int len;
-    int topTrue;
-    struct D *notis;
-};
 
 int main()
 {
-    int n; // applications
-    int k; // events
+    int n, k;
     scanf("%d %d", &n, &k);
 
-    struct notiList list;
-    struct D noti[k];
-    list.last = 0;
-    list.topTrue = 0;
-    list.notis = noti;
-    list.len = k;
+    int *notifApp = malloc((k + 1) * sizeof(int));
+    int *next = malloc((k + 1) * sizeof(int));
+    bool *read = calloc(k + 1, sizeof(bool));
 
-    for (uint8_t i = 0; i < k; i++)
+    int *head = calloc(n + 1, sizeof(int));
+    int *tail = calloc(n + 1, sizeof(int));
+
+    int unread = 0;
+    int lastClear = 0;
+    int t = 0;
+
+    for (int ev = 0; ev < k; ev++)
     {
-        uint8_t eventType;
-        int appNumber;
-        scanf("%hhu %d", &eventType, &appNumber);
+        uint8_t type;
+        int x;
+        scanf("%hhu %d", &type, &x);
 
-        switch (eventType)
-        {
+        switch (type){
         case 1:
-        {
-            struct D d = {.app = appNumber, .read = false};
-            list.notis[list.last++] = d;
-            break;
-        }
+            t++;
+            notifApp[t] = x;
+            next[t] = 0;
+            if (tail[x])
+            {
+                next[tail[x]] = t;
+            }
+            else
+            {
+                head[x] = t;
+            }
+            tail[x] = t;
+            unread++;
+        break;
 
         case 2:
-            for (int i = list.topTrue; i < list.len; i++)
+            int cur = head[x];
+            while (cur)
             {
-                if (list.notis[i].app == appNumber)
+                if (!read[cur])
                 {
-                    list.notis[i].read = true;
+                    read[cur] = true;
+                    unread--;
                 }
+                cur = next[cur];
             }
-            break;
+
+            head[x] = tail[x] = 0;
+        break;
 
         case 3:
-            if(list.topTrue < appNumber)
-                list.topTrue = appNumber;
-            break;
-        }
-
-        int count = 0;
-        for (int i = list.topTrue; i < list.last; i++)
-        {
-            if (!list.notis[i].read)
+            while (lastClear < x)
             {
-                count++;
+                lastClear++;
+                if (lastClear <= t && !read[lastClear])
+                {
+                    read[lastClear] = true;
+                    unread--;
+                }
             }
-        }
-        printf("%i\n", count);
+        break;}
+
+        printf("%d\n", unread);
     }
+
+    free(notifApp);
+    free(next);
+    free(read);
+    free(head);
+    free(tail);
     return 0;
 }
