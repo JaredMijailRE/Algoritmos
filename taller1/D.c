@@ -15,6 +15,7 @@ struct notiList
 {   
     int last;
     int len;
+    int topTrue;
     struct D* notis;
 };
 
@@ -26,7 +27,7 @@ void event1(int appNum, struct notiList* list) {
 
 void event2(int appNum, struct notiList* list)
 {
-    for( int i = 0; i < list->len; i++){
+    for( int i = list->topTrue; i < list->len; i++){
         if(list->notis[i].app == appNum){
             list->notis[i].read = true;
         }
@@ -35,22 +36,22 @@ void event2(int appNum, struct notiList* list)
 
 void event3(int readNoti, struct notiList* list)
 {
-    for( int i = 0; i < readNoti; i++){
+    for( int i = list->topTrue; i < readNoti; i++){
         list->notis[i].read = true;
-
     }
+    list->topTrue = readNoti;
+
 };
 
 void countNoti(struct notiList list){
     int count = 0;
-    for( int i = 0; i < list.last; i++){
+    for( int i = list.topTrue; i < list.last; i++){
         if(!list.notis[i].read){
             count++;
         }
     }
     printf("%i\n", count);
 }
-
 
 
 int main(){
@@ -61,13 +62,11 @@ int main(){
     struct notiList list;
     struct D noti[k];
     list.last = 0;
+    list.topTrue = 0;
     list.notis = noti;
     list.len = k;
 
     for(uint8_t i = 0; i < k; i++){
-
-
-
         uint8_t eventType;
         int appNumber;
         scanf("%hhu %i", &eventType, &appNumber);
@@ -88,7 +87,5 @@ int main(){
         countNoti(list);
 
     }
-
-
     return 0;
 }
