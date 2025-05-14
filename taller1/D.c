@@ -57,7 +57,8 @@ int main()
             break;
 
         case 3:
-            list.topTrue = appNumber;
+            if(list.topTrue < appNumber)
+                list.topTrue = appNumber;
             break;
         }
 
