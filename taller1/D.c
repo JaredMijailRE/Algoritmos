@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 int main()
 {
     int n, k;
@@ -24,12 +23,14 @@ int main()
 
     for (int ev = 0; ev < k; ev++)
     {
-        uint8_t type;
+        int type;
         int x;
-        scanf("%hhu %d", &type, &x);
+        scanf("%d %d", &type, &x);
 
-        switch (type){
+        switch (type)
+        {
         case 1:
+        {
             t++;
             notifApp[t] = x;
             next[t] = 0;
@@ -43,9 +44,11 @@ int main()
             }
             tail[x] = t;
             unread++;
-        break;
+            break;
+        }
 
         case 2:
+        {
             int cur = head[x];
             while (cur)
             {
@@ -58,9 +61,11 @@ int main()
             }
 
             head[x] = tail[x] = 0;
-        break;
+            break;
+        }
 
         case 3:
+        {
             while (lastClear < x)
             {
                 lastClear++;
@@ -70,7 +75,9 @@ int main()
                     unread--;
                 }
             }
-        break;}
+            break;
+        }
+        }
 
         printf("%d\n", unread);
     }
@@ -80,5 +87,6 @@ int main()
     free(read);
     free(head);
     free(tail);
+
     return 0;
 }
