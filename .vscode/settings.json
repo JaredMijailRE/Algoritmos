@@ -3,6 +3,7 @@
         "bitset": "c",
         "chrono": "c",
         "algorithm": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "stdbool.h": "c"
     }
 }
