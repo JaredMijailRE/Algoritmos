@@ -5,63 +5,89 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-int main(){
-
+int main() {
     uint8_t t;
     scanf("%hhu", &t);
 
-    // alocamos memoria suficiente
-    int *N = malloc(sizeof(int) * t);
-    int *K = malloc(sizeof(uint16_t) * t);
+    int *N_arr = (int *)malloc(sizeof(int) * t);
+    uint16_t *K_arr = (uint16_t *)malloc(sizeof(uint16_t) * t);
 
-    // guardamos las inputs
-    int maxN = 0;
-    for(uint8_t i = 0; i < t; i++){
-        scanf("%d %hu", &N[i], &K[i]);
-        if(N[i]>maxN){
-            maxN = N[i];
+    int max_overall_N = 0;
+    for (uint8_t i = 0; i < t; i++) {
+        scanf("%d %hu", &N_arr[i], &K_arr[i]);
+        if (N_arr[i] > max_overall_N) {
+            max_overall_N = N_arr[i];
         }
-
     }
 
-    // calculamos los numeros primos y cuantos habian
+    bool *is_prime = NULL;
+    int *prime_cumulative_count = NULL;
 
-    int N = 100; // o el valor que necesites
-    int size = maxN / 3 + 5;
-    int *prime_count = malloc((size) * sizeof(uint16_t));
-    int *primes = malloc((size) * sizeof(int)); 
-    int prime_index = 0;
-    
-    bool *is_prime = malloc((maxN + 1) * sizeof(bool));
-    for (int i = 0; i <= N; i++) is_prime[i] = true;
-    is_prime[0] = is_prime[1] = false;
-    
-    prime_count[0] = 0;
-    prime_count[1] = 0;
-    
-    // Criba + llenar prime_count[] y primes[]
-    for (int i = 2; i <= N; i++) {
-        if (is_prime[i]) {
-            primes[prime_index++] = i; // Guardamos el primo
-            prime_count[i] = prime_count[i - 1] + 1;
-            for (int j = i * 2; j <= N; j += i) {
-                is_prime[j] = false;
+    if (max_overall_N > 0) {
+        is_prime = (bool *)malloc((max_overall_N + 1) * sizeof(bool));
+        prime_cumulative_count = (int *)malloc((max_overall_N + 1) * sizeof(int));
+
+        for (int i = 0; i <= max_overall_N; i++) is_prime[i] = true;
+        if (max_overall_N >= 0) is_prime[0] = false;
+        if (max_overall_N >= 1) is_prime[1] = false;
+
+        for (int p = 2; (long long)p * p <= max_overall_N; p++) {
+            if (is_prime[p]) {
+                for (long long i = (long long)p * p; i <= max_overall_N; i += p)
+                    is_prime[i] = false;
             }
         }
-        
+
+        prime_cumulative_count[0] = 0;
+        if (max_overall_N >= 1) prime_cumulative_count[1] = 0;
+        for (int i = 2; i <= max_overall_N; i++) {
+            prime_cumulative_count[i] = prime_cumulative_count[i - 1];
+            if (is_prime[i]) {
+                prime_cumulative_count[i]++;
+            }
+        }
+    } else { 
+        prime_cumulative_count = (int *)malloc( ( (max_overall_N > 1 ? max_overall_N : 2) +1) * sizeof(int));
+        for(int i=0; i <= (max_overall_N > 1 ? max_overall_N : 2) ; ++i) prime_cumulative_count[i] = 0;
     }
-    
-    
 
 
+    for (uint8_t test_idx = 0; test_idx < t; test_idx++) {
+        int current_N = N_arr[test_idx];
+        uint16_t current_K = K_arr[test_idx];
+        long long count_k_frequent_ranges = 0;
 
+        if (current_N < 2) { 
+            printf("0\n");
+            continue;
+        }
+        
+        int H_ptr = 2; 
+        for (int L = 2; L <= current_N; L++) {
+            if (H_ptr < L) {
+                H_ptr = L;
+            }
 
+            int primes_at_L_minus_1 = (L - 1 >= 0 && L - 1 <= max_overall_N) ? prime_cumulative_count[L - 1] : 0;
 
-    free(N);
-    free(K);
-    free(prime_count);
-    free(primes);
-    free(is_prime);
+            while (H_ptr <= current_N && 
+                   ( (H_ptr <= max_overall_N ? prime_cumulative_count[H_ptr] : 0) - primes_at_L_minus_1 < current_K) ) {
+                H_ptr++;
+            }
+
+            if (H_ptr <= current_N) {
+                count_k_frequent_ranges += (long long)(current_N - H_ptr + 1);
+            } else {
+                break;
+            }
+        }
+        printf("%lld\n", count_k_frequent_ranges);
+    }
+
+    free(N_arr);
+    free(K_arr);
+    if(is_prime) free(is_prime);
+    if(prime_cumulative_count) free(prime_cumulative_count);
 
     return 0;
 }

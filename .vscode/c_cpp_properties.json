@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/opt/cuda/include"
+            ],
+            "defines": [
+                "__CUDACC__"
+            ],
+            "compilerPath": "/opt/cuda/bin/nvcc",
+            "compilerArgs": [
+                "--cuda-path=/opt/cuda",
+                "--cuda-gpu-arch=sm_70",
+                "--driver-mode=g++"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+} 
