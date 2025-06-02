@@ -1,118 +1,161 @@
-// https://vjudge.net/contest/713089#problem/I
-
 #include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
 #include <stdint.h>
+#include <stdbool.h>
 
-#define GRID_SIZE 9
+#define N          9
 #define EMPTY_CELL '.'
 
-void print_grid(char grid[GRID_SIZE][GRID_SIZE]) {
-    for (uint8_t i = 0; i < GRID_SIZE; i++) {
-        for (uint8_t j = 0; j < GRID_SIZE; j++) {
-            printf("%c", grid[i][j]);
-        }
-        printf("\n");
-    }
+static int row_mask[N], col_mask[N], box_mask[N];
+
+typedef struct { int r, c; } Cell;
+static Cell empties[81];
+static int  empty_count;
+
+static char grid[N][N];
+
+static inline int box_index(int r, int c) {
+    return (r/3)*3 + (c/3);
 }
 
-bool is_safe(char grid[GRID_SIZE][GRID_SIZE], int row, int col, char num_char) {
-    // Check row
-    for (uint8_t c = 0; c < GRID_SIZE; c++) {
-        if (grid[row][c] == num_char) {
-            return false;
-        }
+/**
+ * @param used_mask 
+ * @param depth     
+ */
+static inline int popcount9(int x) {
+    return __builtin_popcount(x);
+}
+
+ 
+  
+
+static bool solve_sudoku(int depth) {
+    if (depth == empty_count) {
+        return true;
     }
 
-    // Check column
-    for (uint8_t r = 0; r < GRID_SIZE; r++) {
-        if (grid[r][col] == num_char) {
-            return false;
-        }
-    }
+    int best_idx   = -1;
+    int best_count = 10;  
 
-    // Check 3x3 subgrid
-    int start_row = row - row % 3;
-    int start_col = col - col % 3;
-    for (uint8_t r = 0; r < 3; r++) {
-        for (uint8_t c = 0; c < 3; c++) {
-            if (grid[r + start_row][c + start_col] == num_char) {
-                return false;
+    for (uint8_t i = depth; i < empty_count; i++) {
+        int r = empties[i].r;
+        int c = empties[i].c;
+        int b = box_index(r, c);
+
+        int used = row_mask[r] | col_mask[c] | box_mask[b];
+        int cand = (~used) & 0x1FF;  
+
+        int cnt = popcount9(cand);
+        if (cnt < best_count) {
+            best_count = cnt;
+            best_idx   = i;
+            if (cnt == 1) {
+                break;
             }
         }
     }
-    return true;
-}
 
-bool find_empty_location(char grid[GRID_SIZE][GRID_SIZE], uint8_t *row, uint8_t *col) {
-    for (*row = 0; *row < GRID_SIZE; (*row)++) {
-        for (*col = 0; *col < GRID_SIZE; (*col)++) {
-            if (grid[*row][*col] == EMPTY_CELL) {
-                return true;
-            }
-        }
-    }
-    return false; 
-}
-
-
-bool solve_sudoku(char grid[GRID_SIZE][GRID_SIZE]) {
-    uint8_t row, col;
-
-    if (!find_empty_location(grid, &row, &col)) {
-        return true; 
+    if (best_idx < 0 || best_count == 0) {
+        return false;
     }
 
-    for (uint8_t num = 1; num <= 9; num++) {
-        char num_char = num + '0'; 
-        if (is_safe(grid, row, col, num_char)) {
-            grid[row][col] = num_char;
+    if (best_idx != depth) {
+        Cell tmp        = empties[depth];
+        empties[depth]  = empties[best_idx];
+        empties[best_idx] = tmp;
+    }
 
-            if (solve_sudoku(grid)) {
-                return true;
-            }
+    int r = empties[depth].r;
+    int c = empties[depth].c;
+    int b = box_index(r, c);
 
-            grid[row][col] = EMPTY_CELL;
+    int used = row_mask[r] | col_mask[c] | box_mask[b];
+    int cand = (~used) & 0x1FF;  
+    while (cand) {
+        int pick_bit = cand & (-cand);
+        cand ^= pick_bit;  
+
+        int d = __builtin_ctz(pick_bit) + 1;  
+
+        grid[r][c]       = '0' + d;
+        row_mask[r]     |= (1 << (d-1));
+        col_mask[c]     |= (1 << (d-1));
+        box_mask[b]     |= (1 << (d-1));
+
+        if (solve_sudoku(depth + 1)) {
+            return true;
         }
+
+        grid[r][c]      = EMPTY_CELL;
+        row_mask[r]    &= ~(1 << (d-1));
+        col_mask[c]    &= ~(1 << (d-1));
+        box_mask[b]    &= ~(1 << (d-1));
+    }
+
+    if (best_idx != depth) {
+        Cell tmp         = empties[depth];
+        empties[depth]   = empties[best_idx];
+        empties[best_idx] = tmp;
     }
     return false;
 }
 
-int main() {
-    int t;
-    scanf("%d", &t);
-   
-    int temp_char;
-    temp_char = getchar(); 
-
-    for (uint8_t case_num = 1; case_num <= t; case_num++) {
-     
-        char line_buffer[GRID_SIZE + 2]; 
-        if (fgets(line_buffer, sizeof(line_buffer), stdin) == NULL && case_num > 0) {
-
+static void print_grid(void) {
+    for (uint8_t i = 0; i < N; i++) {
+        for (uint8_t j = 0; j < N; j++) {
+            putchar(grid[i][j]);
         }
+        putchar('\n');
+    }
+}
 
+int main(void) {
+    int T;
+    if (scanf("%d", &T) != 1) return 0;
 
-        char grid[GRID_SIZE][GRID_SIZE];
-        for (int i = 0; i < GRID_SIZE; i++) {
-            for (int j = 0; j < GRID_SIZE; j++) {
-                scanf(" %c", &grid[i][j]); 
+    int ch = getchar();
+    (void)ch;
+
+    for (int case_num = 1; case_num <= T; case_num++) {
+        
+        for (uint8_t i = 0; i < N; i++) {
+            for (uint8_t j = 0; j < N; j++) {
+                char x;
+                
+                do {
+                    if (scanf("%c", &x) != 1) x = 0;
+                } while (!( (x >= '1' && x <= '9') || (x == EMPTY_CELL) ));
+                grid[i][j] = x;
             }
         }
-      
-        if (case_num < t || t == 1 ) { 
-            while((temp_char = getchar()) != '\n' && temp_char != EOF);
+
+        for (uint8_t i = 0; i < N; i++) {
+            row_mask[i] = 0;
+            col_mask[i] = 0;
+            box_mask[i] = 0;
+        }
+        empty_count = 0;
+
+        for (uint8_t i = 0; i < N; i++) {
+            for (uint8_t j = 0; j < N; j++) {
+                char c = grid[i][j];
+                if (c == EMPTY_CELL) {
+                    empties[empty_count].r = i;
+                    empties[empty_count].c = j;
+                    empty_count++;
+                } else {
+                    int d = c - '0';  
+                    int bit = 1 << (d - 1);
+                    row_mask[i]   |= bit;
+                    col_mask[j]   |= bit;
+                    box_mask[box_index(i,j)] |= bit;
+                }
+            }
         }
 
-
+        bool solved = solve_sudoku(0);
         printf("Case %d:\n", case_num);
-        if (solve_sudoku(grid)) {
-            print_grid(grid);
-        } else {
-           
-            printf("No solution exists (this should not happen for this problem).\n");
-        }
+        print_grid();
+        while ((ch = getchar()) != '\n' && ch != EOF);
     }
     return 0;
 }
