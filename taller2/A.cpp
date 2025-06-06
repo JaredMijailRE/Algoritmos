@@ -21,31 +21,24 @@ using u16 = uint_fast16_t;
 using point = tuple<u16, u16>;
 
 
-Matrix getLabyrinth(point *inicio, point *meta){
+Matrix getLabyrinth(point &inicio, point &meta) {
     u16 height, width;
-    point& inicioPunto = *inicio;
-    point& metaPunto = *meta;
     cin >> height >> width;
-    cin.ignore();
-    
-    Matrix labyrinth;
-    getchar(); // consumimos el salto de linea
+
+    Matrix labyrinth(height, vector<char>(width));
     string row;
     for (u16 i = 0; i < height; i++) {
-        getline(cin, row);
-        labyrinth.push_back(vector<char>(row.begin(), row.end()));
-        u16 posInicio = row.find("A");
-        u16 posMeta = row.find("B");
-
-        if(posInicio != -1){
-            inicioPunto = {i, posInicio};
-        }
-
-        if(posMeta != -1){
-            metaPunto = {i, posMeta};
+        cin >> row;  // leemos exactamente m caracteres
+        for (u16 j = 0; j < width; j++) {
+            labyrinth[i][j] = row[j];
+            if (row[j] == 'A') {
+                inicio = {i, j};
+            }
+            if (row[j] == 'B') {
+                meta = {i, j};
+            }
         }
     }
-
     return labyrinth;
 }
 
@@ -119,7 +112,7 @@ void solveLabyrinth(point inicio, point meta, Matrix labyrinth) {
 int main() {
     point inicio, meta;
 
-    Matrix laberinto = getLabyrinth(&inicio, &meta);
+    Matrix laberinto = getLabyrinth(inicio, meta);
     solveLabyrinth(inicio, meta, laberinto);
 
     return 0;
