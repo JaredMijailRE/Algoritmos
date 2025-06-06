@@ -7,9 +7,12 @@
 #include <vector>
 #include <stdio.h>
 #include <stdint.h>
-#include <cstdio>
 #include <string>
 #include <tuple>
+#include <queue>
+#include <map>
+#include <algorithm>
+
 using namespace std;
 
 // definimos el tipo matrix
@@ -46,18 +49,78 @@ Matrix getLabyrinth(point *inicio, point *meta){
     return labyrinth;
 }
 
-void solveLabyrinth(point inicio, point meta, Matrix labyrith){
+void solveLabyrinth(point inicio, point meta, Matrix labyrinth) {
+    // usamos algoritmo A*
+    u16 height = labyrinth.size();
+    u16 width = labyrinth[0].size();
 
-    
+    vector<vector<bool>> visited(height, vector<bool>(width, false));
+    map<point, pair<point, char>> parent;
 
+    queue<point> q;
+    q.push(inicio);
+    visited[get<0>(inicio)][get<1>(inicio)] = true;
+
+    vector<tuple<int_fast8_t, int_fast8_t, char>> dirs = {
+        {-1, 0, 'U'},
+        {1, 0, 'D'},
+        {0, -1, 'L'},
+        {0, 1, 'R'}
+    };
+
+    bool found = false;
+
+    while (!q.empty()) {
+        point current = q.front();
+        q.pop();
+
+        if (current == meta) {
+            found = true;
+            break;
+        }
+
+        u16 x = get<0>(current);
+        u16 y = get<1>(current);
+
+        for (auto [dx, dy, dir] : dirs) {
+            u16 nx = x + dx;
+            u16 ny = y + dy;
+
+            if (nx < height && ny < width && !visited[nx][ny] && labyrinth[nx][ny] != '#') {
+                visited[nx][ny] = true;
+                point next = {nx, ny};
+                parent[next] = {current, dir};
+                q.push(next);
+            }
+        }
+    }
+
+    if (!found) {
+        cout << "NO" << endl;
+        return;
+    }
+
+    // reconstruir camino
+    string path;
+    point curr = meta;
+    while (curr != inicio) {
+        auto [prev, dir] = parent[curr];
+        path += dir;
+        curr = prev;
+    }
+
+    reverse(path.begin(), path.end());
+
+    cout << "YES" << endl;
+    cout << path.size() << endl;
+    cout << path << endl;
 }
 
 int main() {
     point inicio, meta;
 
     Matrix laberinto = getLabyrinth(&inicio, &meta);
+    solveLabyrinth(inicio, meta, laberinto);
 
-
-    
     return 0;
 }
