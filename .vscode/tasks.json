@@ -24,7 +24,7 @@
             "command": "bash",
             "args": [
                 "-c",
-                "gcc -fdiagnostics-color=always -g '${file}' -o '${fileBasenameNoExtension}' && ./'${fileBasenameNoExtension}' && rm '${fileBasenameNoExtension}'"
+                "gcc -fdiagnostics-color=always -g '${file}' -o '${fileBasenameNoExtension}' && ./'${fileBasenameNoExtension}'"
             ],
             "options": {
                 "cwd": "${fileDirname}"
