@@ -1,7 +1,8 @@
 {
-    "files.associations": {
-        "cstdint": "cpp",
-        "tuple": "cpp",
-        "iostream": "cpp"
-    }
+  "files.associations": {
+    "cstdint": "cpp",
+    "tuple": "cpp",
+    "iostream": "cpp"
+  },
+  "C_Cpp_Runner.msvcBatchPath": ""
 }

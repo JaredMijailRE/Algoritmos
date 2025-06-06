@@ -43,7 +43,7 @@ Matrix getLabyrinth(point &inicio, point &meta) {
 }
 
 void solveLabyrinth(point inicio, point meta, Matrix labyrinth) {
-    // usamos algoritmo A*
+    // usamos algoritmo BFS
     u16 height = labyrinth.size();
     u16 width = labyrinth[0].size();
 
