@@ -39,11 +39,9 @@ void occupyRoom(Matrix &building, u16 x, u16 y){
     u16 height = building.size();
     u16 width = building[0].size();
 
-    // Direcciones: arriba, abajo, izquierda, derecha
     const int dx[] = {-1, 1, 0, 0};
     const int dy[] = {0, 0, -1, 1};
 
-    // Usamos BFS para ocupar todo el cuarto
     queue<point> q;
     q.push({x, y});
     building[x][y] = '#';
@@ -53,12 +51,12 @@ void occupyRoom(Matrix &building, u16 x, u16 y){
         q.pop();
 
         for (int dir = 0; dir < 4; dir++) {
-            int nx = cx + dx[dir];
-            int ny = cy + dy[dir];
+            int nx = int(cx) + dx[dir];
+            int ny = int(cy) + dy[dir];
 
-            if (nx >= 0 && nx < height && ny >= 0 && ny < width && building[nx][ny] == '.') {
+            if (nx >= 0 && nx < static_cast<int>(height) && ny >= 0 && ny < static_cast<int>(width) && building[nx][ny] == '.') {
                 building[nx][ny] = '#';
-                q.push({nx, ny});
+                q.push({u16(nx), u16(ny)});
             }
         }
     }
