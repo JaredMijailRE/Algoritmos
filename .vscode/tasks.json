@@ -72,6 +72,26 @@
             "problemMatcher": [],
             "group": "build",
             "detail": "Compiles and runs the active CUDA file."
+        },
+        {
+            "type": "shell",
+            "label": "C++: g++ build and run active file",
+            "command": "bash",
+            "args": [
+                "-c",
+                "g++ -fdiagnostics-color=always -g '${file}' -o '${fileBasenameNoExtension}' && ./'${fileBasenameNoExtension}' && rm '${fileBasenameNoExtension}'"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Compiles, runs, and cleans the active C++ file"
         }
     ]
 }

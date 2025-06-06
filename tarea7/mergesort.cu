@@ -69,13 +69,16 @@ int main()
     while (step < n)
     {
 
+        // calculamos el numero de pares
         int numPairs = (n + (2 * step - 1)) / (2 * step);
         if (numPairs <= 0)
             break;
 
+        // se configura el lanzamineto del kernel
         int blockSize = 128;
         int gridSize = (numPairs + blockSize - 1) / blockSize;
 
+        // alternamos los arrays de entrada y salida
         int *d_input = (srcIsInput ? d_src : d_dst);
         int *d_output = (srcIsInput ? d_dst : d_src);
 
