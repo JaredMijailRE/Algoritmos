@@ -9,15 +9,19 @@
 #include <stdint.h>
 #include <cstdio>
 #include <string>
+#include <tuple>
 using namespace std;
 
 // definimos el tipo matrix
 using Matrix = vector<vector<char>>;
 using u16 = uint_fast16_t;
+using point = tuple<u16, u16>;
 
 
-Matrix getLabyrinth(){
+Matrix getLabyrinth(point *inicio, point *meta){
     u16 height, width;
+    point& inicioPunto = *inicio;
+    point& metaPunto = *meta;
     cin >> height >> width;
     cin.ignore();
     
@@ -27,14 +31,32 @@ Matrix getLabyrinth(){
     for (u16 i = 0; i < height; i++) {
         getline(cin, row);
         labyrinth.push_back(vector<char>(row.begin(), row.end()));
+        u16 posInicio = row.find("A");
+        u16 posMeta = row.find("B");
+
+        if(posInicio != -1){
+            inicioPunto = {i, posInicio};
+        }
+
+        if(posMeta != -1){
+            metaPunto = {i, posMeta};
+        }
     }
 
     return labyrinth;
 }
 
-int main() {
+void solveLabyrinth(point inicio, point meta, Matrix labyrith){
 
-    Matrix laberinto = getLabyrinth();
+    
+
+}
+
+int main() {
+    point inicio, meta;
+
+    Matrix laberinto = getLabyrinth(&inicio, &meta);
+
 
     
     return 0;
